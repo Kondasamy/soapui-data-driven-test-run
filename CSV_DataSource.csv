@@ -1,0 +1,8 @@
+TEST CASE NAME,RUN?,SMOKE?
+Test case 1,Y,Y
+Test case 2,Y,N
+Test case 3,N,Y
+Test case 4,Y,Y
+Test case 5,N,Y
+Test case 6,N,Y
+Non existing TC,Y,Y
