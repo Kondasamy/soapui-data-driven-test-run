@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-project activeEnvironment="Default" name="Sample Google Maps Project" resourceRoot="" soapui-version="5.2.1" id="4923f525-e747-4c88-a393-97e3cfb5dafa" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config">
+<con:soapui-project activeEnvironment="Default" name="Sample Google Maps Project" resourceRoot="" soapui-version="5.2.1" id="4923f525-e747-4c88-a393-97e3cfb5dafa" abortOnError="false" runType="SEQUENTIAL" defaultScriptLanguage="Groovy" xmlns:con="http://eviware.com/soapui/config">
     <con:settings/>
     <con:interface xsi:type="con:RestService" wadlVersion="http://wadl.dev.java.net/2009/02" name="Direction API" type="rest" basePath="" id="4c37ae44-3eab-49ad-ab2e-f54902af57fe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <con:settings/>
@@ -1328,14 +1328,9 @@ groovyUtils = new com.eviware.soapui.support.GroovyUtils(context)
 projectDir = groovyUtils.projectPath // &lt;- SoapUI Project directory
 inputPath = projectDir+"\\$csvDataFile"
 inputFile = new File(inputPath)
-
-projectHandle = testRunner.testCase.testSuite.project
-
-//File existence check
-if(!inputFile.exists())
-	log.error "File not exists -> $inputPath"
-else
+if(inputFile.exists())
 {
+	projectHandle = testRunner.testCase.testSuite.project
 	fileLength = inputFile.readLines().size()
 	if(fileLength>1)	//Iterate through file for list of test cases	
 	{
@@ -1346,24 +1341,27 @@ else
 			if(counter>1) //Exclude header
 			{
 				testDetails = line.split(",")
-				testCaseName = testDetails[0]
+				testCaseName = testDetails[0].toString()
 				testRunFlag = testDetails[1]
 				smokeTestFlag = testDetails[2]
 				if(testRunFlag == 'Y')
 				{
 					testCaseToRun = null
-					projectHandle.testSuites.each()
+					projectHandle.testSuiteList.each()
 					{
 						testSuite ->
-						testSuite.testCases.each()
+						testSuite.getTestCaseList().each()
 						{
 							testCase ->
-							if(testCase.name.toLower() == testCaseName.toLower())
+							if(testCase.name.equalsIgnoreCase(testCaseName))
 								testCaseToRun = testCase
 						}
 					}
 					if(testCaseToRun != null)
-						testCaseToRun.run(testRunner,context)
+					{
+						log.info "Running test -> "+testCaseToRun.name
+						//testCaseToRun.run(testRunner,context)
+					}
 					else
 						log.warn "TEST CASE NOT FOUND -> $testCaseName"
 				}
@@ -1372,13 +1370,16 @@ else
 					log.info "TEST RUN SKIPPED :: $testCaseName"
 				}
 			}
+			counter++
 		}
 	}
 	else
 		log.error "File doesn't have test cases to run!"
+	log.info "*****TEST RUN COMPLETED ******"
 }
-</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite>
-    <con:testSuite name="Directions API TestSuite" id="a135ad89-d559-44e6-9fc8-e280bef19adb">
+else
+	log.error "File not exists -> $inputPath"</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite>
+    <con:testSuite name="Directions API TestSuite" id="a135ad89-d559-44e6-9fc8-e280bef19adb" disabled="true">
         <con:settings/>
         <con:runType>SEQUENTIAL</con:runType>
         <con:testCase failOnError="false" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Test case 1" searchProperties="true" id="98b8de39-fe2a-403d-9b79-23ee135182c5" timeout="0" wsrmEnabled="false" wsrmVersion="1.0" wsrmAckTo="" amfAuthorisation="false" amfEndpoint="" amfLogin="" amfPassword="">
@@ -1515,7 +1516,7 @@ else
         <con:properties/>
         <con:reportParameters/>
     </con:testSuite>
-    <con:testSuite name="Distance Matrix API TestSuite" id="615c44bc-939a-4a74-8f00-f168e52dac80">
+    <con:testSuite name="Distance Matrix API TestSuite" id="615c44bc-939a-4a74-8f00-f168e52dac80" disabled="true">
         <con:settings/>
         <con:runType>SEQUENTIAL</con:runType>
         <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Test case 2" searchProperties="true" id="6fd92de6-1d56-4dbe-a104-cdfe9bfed908">
@@ -1650,7 +1651,7 @@ else
         </con:testCase><con:properties/>
         <con:reportParameters/>
     </con:testSuite>
-    <con:testSuite name="Elevation API TestSuite" id="5368c528-b028-4cd7-9aa5-6ecca63469b6">
+    <con:testSuite name="Elevation API TestSuite" id="5368c528-b028-4cd7-9aa5-6ecca63469b6" disabled="true">
         <con:settings/>
         <con:runType>SEQUENTIAL</con:runType>
         <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Test case 4" searchProperties="true" id="a268648f-bcfa-4147-af49-77a38fcae8f5">
@@ -1810,7 +1811,7 @@ else
         <con:properties/>
         <con:reportParameters/>
     </con:testSuite>
-    <con:testSuite name="Geocoding API TestSuite" id="7c99d169-bbdf-44c6-9f05-320456443483">
+    <con:testSuite name="Geocoding API TestSuite" id="7c99d169-bbdf-44c6-9f05-320456443483" disabled="true">
         <con:settings/>
         <con:runType>SEQUENTIAL</con:runType>
         <con:testCase failOnError="false" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Test case 5" searchProperties="true" id="153f03eb-aeb6-4c1d-a609-20de8a4b8048" timeout="0" wsrmEnabled="false" wsrmVersion="1.0" wsrmAckTo="" amfAuthorisation="false" amfEndpoint="" amfLogin="" amfPassword="">
@@ -2127,7 +2128,7 @@ else
         <con:reportParameters/>
     </con:testSuite>
     
-    <con:testSuite name="Time Zone API TestSuite" id="14fe4353-d781-4fa8-8938-349be4e1f640">
+    <con:testSuite name="Time Zone API TestSuite" id="14fe4353-d781-4fa8-8938-349be4e1f640" disabled="true">
         <con:settings/>
         <con:runType>SEQUENTIAL</con:runType>
         <con:testCase failOnError="false" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Test case 6" searchProperties="true" id="7eb01803-12ae-4ad9-9ba2-baa9ce3a2811" timeout="0" wsrmEnabled="false" wsrmVersion="1.0" wsrmAckTo="" amfAuthorisation="false" amfEndpoint="" amfLogin="" amfPassword="">
